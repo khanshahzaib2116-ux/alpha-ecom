@@ -30,6 +30,13 @@ export default function AuthPage() {
     try {
       if (mode === 'login') {
         await account.createEmailPasswordSession({ email, password })
+        const user = await account.get()
+        if (user.labels?.includes('admin')) {
+          await account.deleteSession('current')
+          setError('Admins must sign in from the admin panel.')
+          setLoading(false)
+          return
+        }
         router.push('/')
         router.refresh()
       } else {

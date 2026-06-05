@@ -4,12 +4,15 @@ const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT
 const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID
 const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID
 
-const client = new Client()
-  .setEndpoint(endpoint)
-  .setProject(projectId)
+let client
+try {
+  client = new Client().setEndpoint(endpoint).setProject(projectId)
+} catch {
+  client = null
+}
 
-export const account = new Account(client)
-export const databases = new Databases(client)
+export const account = client ? new Account(client) : null
+export const databases = client ? new Databases(client) : null
 export { ID }
 
 export const COLLECTIONS = {

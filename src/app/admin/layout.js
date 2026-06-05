@@ -17,6 +17,10 @@ export default function AdminLayout({ children }) {
       return
     }
 
+    if (!account) {
+      router.push('/admin/login')
+      return
+    }
     account.get()
       .then((user) => {
         const isAdmin = user.labels?.includes('admin')
