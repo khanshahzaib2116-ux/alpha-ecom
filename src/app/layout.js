@@ -1,3 +1,4 @@
+import { Client, Databases } from 'appwrite'
 import { CartProvider } from '@/context/CartContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { WishlistProvider } from '@/context/WishlistContext'
@@ -10,14 +11,32 @@ export const metadata = {
   description: 'Premium minimalist apparel store with cash on delivery across all locations.',
 }
 
-export default function RootLayout({ children }) {
+const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT
+const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID
+const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID
+const categoriesCol = '6a231e1610e5801f72b5'
+
+async function getCategories() {
+  try {
+    const client = new Client().setEndpoint(endpoint).setProject(projectId)
+    const databases = new Databases(client)
+    const { documents } = await databases.listDocuments(databaseId, categoriesCol, [])
+    return (documents || []).map(({ name, slug }) => ({ name, slug }))
+  } catch {
+    return []
+  }
+}
+
+export default async function RootLayout({ children }) {
+  const categories = await getCategories()
+
   return (
     <html lang="en" className="h-full">
       <body className="min-h-full flex flex-col bg-white text-black antialiased">
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              <Navbar />
+              <Navbar categories={categories} />
               <main className="flex-1">{children}</main>
               <CartPanel />
               <footer className="border-t border-black/5 py-12">
@@ -32,8 +51,9 @@ export default function RootLayout({ children }) {
                     <div>
                       <h3 className="text-xs uppercase tracking-widest font-medium mb-3">Quick Links</h3>
                       <div className="space-y-2">
-                        <a href="/shop/t-shirts" className="block text-xs text-ash hover:text-black transition-colors">T-Shirts</a>
-                        <a href="/shop/caps" className="block text-xs text-ash hover:text-black transition-colors">Caps</a>
+                        {categories.map(cat => (
+                          <a key={cat.slug} href={`/shop/${cat.slug}`} className="block text-xs text-ash hover:text-black transition-colors">{cat.name}</a>
+                        ))}
                         <a href="/orders" className="block text-xs text-ash hover:text-black transition-colors">My Orders</a>
                         <a href="/wishlist" className="block text-xs text-ash hover:text-black transition-colors">Wishlist</a>
                       </div>

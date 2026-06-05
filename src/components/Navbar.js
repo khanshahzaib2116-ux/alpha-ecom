@@ -7,13 +7,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useState, useRef, useEffect } from 'react'
 
-const categories = [
-  { name: 'All', slug: null },
-  { name: 'T-Shirts', slug: 't-shirts' },
-  { name: 'Caps', slug: 'caps' },
-]
-
-export default function Navbar() {
+export default function Navbar({ categories = [] }) {
   const { totalItems, setIsOpen } = useCart()
   const { user, profile, signOut } = useAuth()
   const { count: wishlistCount } = useWishlist()
