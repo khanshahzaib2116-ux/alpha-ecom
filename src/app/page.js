@@ -10,6 +10,7 @@ const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID
 const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID
 const productsCol = '6a231e182905825b878a'
 const categoriesCol = '6a231e1610e5801f72b5'
+const slidesCol = '6a231e3467528f571c88'
 
 const client = new Client().setEndpoint(endpoint).setProject(projectId)
 const databases = new Databases(client)
@@ -17,6 +18,17 @@ const databases = new Databases(client)
 export default async function HomePage() {
   const { documents: products } = await databases.listDocuments(databaseId, productsCol, [])
   const { documents: categories } = await databases.listDocuments(databaseId, categoriesCol, [])
+  let slides = []
+  try {
+    const { documents: s } = await databases.listDocuments(databaseId, slidesCol, [])
+    slides = (s || []).map(slide => ({
+      title: slide.title || '',
+      subtitle: slide.subtitle || '',
+      cta: 'Shop Now',
+      link: slide.redirect_url || '/',
+      image_url: slide.image_url,
+    }))
+  } catch {}
 
   const mapped = (products || []).map(p => ({ ...p, id: p.$id }))
   const featured = mapped.filter(p => p.is_featured)
@@ -24,7 +36,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSlider />
+      <HeroSlider slides={slides} />
 
       {featured.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

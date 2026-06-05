@@ -2,52 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { databases, DATABASE_ID, COLLECTIONS } from '@/lib/appwrite'
 
-const fallbackSlides = [
-  {
-    title: 'Premium T-Shirts',
-    subtitle: 'Crafted for the modern minimalist',
-    cta: 'Shop Now',
-    link: '/shop/t-shirts',
-    image_url: null,
-  },
-  {
-    title: 'Essential Caps',
-    subtitle: 'Timeless design, everyday wear',
-    cta: 'Explore Caps',
-    link: '/shop/caps',
-    image_url: null,
-  },
-  {
-    title: 'New Collection',
-    subtitle: 'Noir & Alabaster — exclusively monochrome',
-    cta: 'View All',
-    link: '/',
-    image_url: null,
-  },
-]
-
-export default function HeroSlider() {
-  const [slides, setSlides] = useState(fallbackSlides)
+export default function HeroSlider({ slides: initialSlides }) {
   const [current, setCurrent] = useState(0)
+  const slides = initialSlides && initialSlides.length > 0 ? initialSlides : [
+    { title: 'Premium T-Shirts', subtitle: 'Crafted for the modern minimalist', cta: 'Shop Now', link: '/shop/t-shirts', image_url: null },
+    { title: 'Essential Caps', subtitle: 'Timeless design, everyday wear', cta: 'Explore Caps', link: '/shop/caps', image_url: null },
+    { title: 'New Collection', subtitle: 'Noir & Alabaster — exclusively monochrome', cta: 'View All', link: '/', image_url: null },
+  ]
 
   useEffect(() => {
-    databases.listDocuments(DATABASE_ID, COLLECTIONS.carouselSlides, []).then(({ documents }) => {
-      if (documents && documents.length > 0) {
-        setSlides(documents.map(s => ({
-          title: s.title || '',
-          subtitle: s.subtitle || '',
-          cta: 'Shop Now',
-          link: s.redirect_url || '/',
-          image_url: s.image_url,
-        })))
-      }
-    })
-  }, [])
-
-  useEffect(() => {
-    if (slides.length === 0) return
     const timer = setInterval(() => {
       setCurrent(prev => (prev + 1) % slides.length)
     }, 3000)
@@ -57,8 +21,6 @@ export default function HeroSlider() {
   const goTo = (index) => setCurrent(index)
   const prev = () => setCurrent(prev => (prev - 1 + slides.length) % slides.length)
   const next = () => setCurrent(prev => (prev + 1) % slides.length)
-
-  if (slides.length === 0) return null
 
   return (
     <div className="relative w-full h-[60vh] min-h-[400px] bg-black overflow-hidden">
