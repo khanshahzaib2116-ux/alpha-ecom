@@ -99,7 +99,7 @@ export default function EditProductPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-[10px] uppercase tracking-widest text-ash mb-1.5">Price ($)</label>
+            <label className="block text-[10px] uppercase tracking-widest text-ash mb-1.5">Price (Rs)</label>
             <input type="number" step="0.01" min="0" value={form.price} onChange={e => update('price', e.target.value)} required
               className="w-full px-4 py-2.5 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-black" />
           </div>

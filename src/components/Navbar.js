@@ -98,9 +98,18 @@ export default function Navbar() {
                       <Heart size={14} />
                       Wishlist
                     </Link>
+                    {profile?.is_admin && (
+                      <Link
+                        href="/admin/dashboard"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-xs text-black font-medium hover:bg-ivory transition-colors border-t border-black/5"
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
                     <button
                       onClick={() => { signOut(); setDropdownOpen(false) }}
-                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs text-ash hover:text-black hover:bg-ivory transition-colors border-t border-black/5"
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs text-ash hover:text-black hover:bg-ivory transition-colors"
                     >
                       <LogOut size={14} />
                       Sign Out
@@ -169,6 +178,15 @@ export default function Navbar() {
                 >
                   My Orders
                 </Link>
+                {profile?.is_admin && (
+                  <Link
+                    href="/admin/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="block text-sm text-black font-medium hover:text-black transition-colors"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
                 <button
                   onClick={() => { signOut(); setMobileOpen(false) }}
                   className="block text-sm text-ash hover:text-black transition-colors"
