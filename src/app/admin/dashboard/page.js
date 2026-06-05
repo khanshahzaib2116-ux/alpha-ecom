@@ -9,10 +9,18 @@ const productsCol = '6a231e182905825b878a'
 const categoriesCol = '6a231e1610e5801f72b5'
 
 export default async function AdminDashboardPage() {
-  const client = new Client().setEndpoint(endpoint).setProject(projectId)
-  const databases = new Databases(client)
-  const { documents: products } = await databases.listDocuments(databaseId, productsCol, [])
-  const { documents: categories } = await databases.listDocuments(databaseId, categoriesCol, [])
+  let products = []
+  let categories = []
+  try {
+    const client = new Client().setEndpoint(endpoint).setProject(projectId)
+    const databases = new Databases(client)
+    const [pr, cat] = await Promise.all([
+      databases.listDocuments(databaseId, productsCol, []),
+      databases.listDocuments(databaseId, categoriesCol, []),
+    ])
+    if (pr?.documents) products = pr.documents
+    if (cat?.documents) categories = cat.documents
+  } catch {}
 
   const totalProducts = products?.length || 0
   const totalStock = products?.reduce((sum, p) => sum + (p.stock_count || 0), 0) || 0
