@@ -8,10 +8,9 @@ const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID
 const productsCol = '6a231e182905825b878a'
 const categoriesCol = '6a231e1610e5801f72b5'
 
-const client = new Client().setEndpoint(endpoint).setProject(projectId)
-const databases = new Databases(client)
-
 export default async function AdminDashboardPage() {
+  const client = new Client().setEndpoint(endpoint).setProject(projectId)
+  const databases = new Databases(client)
   const { documents: products } = await databases.listDocuments(databaseId, productsCol, [])
   const { documents: categories } = await databases.listDocuments(databaseId, categoriesCol, [])
 
