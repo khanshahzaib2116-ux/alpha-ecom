@@ -14,7 +14,18 @@ export default async function AdminProductsPage() {
     const client = new Client().setEndpoint(endpoint).setProject(projectId)
     const databases = new Databases(client)
     const result = await databases.listDocuments(databaseId, productsCol, [])
-    if (result?.documents) products = result.documents
+    if (result?.documents) {
+      products = result.documents.map(d => ({
+        $id: d.$id,
+        title: d.title || '',
+        price: d.price || 0,
+        sale_price: d.sale_price || null,
+        stock_count: d.stock_count ?? 0,
+        image_url: d.image_url || '',
+        category_id: d.category_id || '',
+        description: d.description || '',
+      }))
+    }
   } catch {}
 
   return <AdminProductsTable products={products} />

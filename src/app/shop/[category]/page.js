@@ -38,7 +38,18 @@ export default async function CategoryPage({ params }) {
     }
   } catch {}
 
-  const mapped = (products || []).map(p => ({ ...p, id: p.$id }))
+  const mapped = (products || []).map(p => ({
+    $id: p.$id,
+    id: p.$id,
+    title: p.title || '',
+    price: p.price || 0,
+    sale_price: p.sale_price || null,
+    stock_count: p.stock_count ?? 0,
+    image_url: p.image_url || '',
+    category_id: p.category_id || '',
+    description: p.description || '',
+    is_featured: p.is_featured || false,
+  }))
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

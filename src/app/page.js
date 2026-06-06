@@ -41,7 +41,18 @@ export default async function HomePage() {
     }))
   } catch {}
 
-  const mapped = (products || []).map(p => ({ ...p, id: p.$id }))
+  const mapped = (products || []).map(p => ({
+    $id: p.$id,
+    id: p.$id,
+    title: p.title || '',
+    price: p.price || 0,
+    sale_price: p.sale_price || null,
+    stock_count: p.stock_count ?? 0,
+    image_url: p.image_url || '',
+    category_id: p.category_id || '',
+    description: p.description || '',
+    is_featured: p.is_featured || false,
+  }))
   const featured = mapped.filter(p => p.is_featured)
   const onSale = mapped.filter(p => p.sale_price && p.sale_price < p.price).slice(0, 10)
 
