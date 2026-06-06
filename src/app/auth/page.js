@@ -15,44 +15,56 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [verificationSent, setVerificationSent] = useState(false)
+  const [pendingEmail, setPendingEmail] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setLoading(true)
 
     if (mode === 'signup' && password !== confirmPassword) {
       setError('Passwords do not match')
+      setLoading(false)
       return
     }
-
-    setLoading(true)
 
     try {
       if (mode === 'login') {
         await account.createEmailPasswordSession({ email, password })
         const user = await account.get()
+
         if (user.labels?.includes('admin')) {
           await account.deleteSession('current')
           setError('Admins must sign in from the admin panel.')
           setLoading(false)
           return
         }
-        router.push('/')
-        router.refresh()
-      } else {
-        await account.create({ userId: ID.unique(), email, password, name })
-        await account.createEmailPasswordSession({ email, password })
 
-        try {
-          const origin = window.location.origin
-          await account.createVerification(`${origin}/verify`)
-          setVerificationSent(true)
-        } catch {
-          // verification template might not be configured yet
+        if (!user.emailVerification) {
+          await account.deleteSession('current')
+          setError('Please verify your email before signing in. Check your inbox (including spam).')
+          setPendingEmail(email)
+          setLoading(false)
+          return
         }
 
         router.push('/')
         router.refresh()
+      } else {
+        await account.create({ userId: ID.unique(), email, password, name })
+
+        try {
+          const origin = window.location.origin
+          await account.createVerification(`${origin}/verify`)
+        } catch (e) {
+          setError('Account created but could not send verification email. Contact support.')
+          setLoading(false)
+          return
+        }
+
+        setPendingEmail(email)
+        setVerificationSent(true)
+        setLoading(false)
       }
     } catch (err) {
       const msg = err.message || ''
@@ -65,6 +77,20 @@ export default function AuthPage() {
       } else {
         setError(msg || 'Something went wrong. Please try again.')
       }
+      setLoading(false)
+    }
+  }
+
+  const handleResend = async () => {
+    if (!pendingEmail) return
+    setLoading(true)
+    setError('')
+    try {
+      const origin = window.location.origin
+      await account.createVerification(`${origin}/verify`)
+      setVerificationSent(true)
+    } catch {
+      setError('Could not resend verification email. Try again later.')
     }
     setLoading(false)
   }
@@ -73,6 +99,39 @@ export default function AuthPage() {
     setMode(mode === 'login' ? 'signup' : 'login')
     setError('')
     setVerificationSent(false)
+    setPendingEmail('')
+  }
+
+  if (verificationSent) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center py-20">
+        <div className="w-full max-w-sm px-8 text-center">
+          <div className="mb-6">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-semibold tracking-tight mb-2">Check Your Email</h1>
+            <p className="text-sm text-ash">
+              We sent a verification link to <strong className="text-black">{pendingEmail}</strong>
+            </p>
+            <p className="text-xs text-ash mt-2">Click the link in the email to activate your account, then sign in.</p>
+          </div>
+
+          <div className="space-y-3">
+            <button onClick={handleResend} disabled={loading}
+              className="w-full py-3 bg-black text-white text-xs uppercase tracking-widest font-medium hover:bg-charcoal transition-colors disabled:opacity-50">
+              {loading ? 'Sending...' : 'Resend Email'}
+            </button>
+            <button onClick={() => { setVerificationSent(false); setMode('login') }}
+              className="w-full py-3 bg-ivory text-ash text-xs uppercase tracking-widest font-medium hover:text-black transition-colors">
+              Sign In
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -86,13 +145,6 @@ export default function AuthPage() {
             {mode === 'login' ? 'Welcome back' : 'Join Noir & Alabaster'}
           </p>
         </div>
-
-        {verificationSent && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 text-center">
-            <p className="text-xs text-green-700 font-medium mb-1">Account created!</p>
-            <p className="text-[10px] text-green-600">Check your email to verify your account.</p>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {mode === 'signup' && (
@@ -130,6 +182,13 @@ export default function AuthPage() {
           )}
 
           {error && <p className="text-xs text-red-500">{error}</p>}
+
+          {error && pendingEmail && mode === 'login' && (
+            <button onClick={handleResend} disabled={loading}
+              className="w-full py-2.5 bg-ivory text-ash text-xs uppercase tracking-widest font-medium hover:text-black transition-colors disabled:opacity-50">
+              Resend Verification Email
+            </button>
+          )}
 
           <button type="submit" disabled={loading}
             className="w-full py-3 bg-black text-white text-xs uppercase tracking-widest font-medium hover:bg-charcoal transition-colors disabled:opacity-50">
