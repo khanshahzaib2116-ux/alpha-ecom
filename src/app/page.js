@@ -12,14 +12,25 @@ const productsCol = '6a231e182905825b878a'
 const categoriesCol = '6a231e1610e5801f72b5'
 const slidesCol = '6a231e3467528f571c88'
 
-const client = new Client().setEndpoint(endpoint).setProject(projectId)
-const databases = new Databases(client)
-
 export default async function HomePage() {
-  const { documents: products } = await databases.listDocuments(databaseId, productsCol, [])
-  const { documents: categories } = await databases.listDocuments(databaseId, categoriesCol, [])
+  let products = []
+  let categories = []
   let slides = []
   try {
+    const client = new Client().setEndpoint(endpoint).setProject(projectId)
+    const databases = new Databases(client)
+    const result = await databases.listDocuments(databaseId, productsCol, [])
+    if (result?.documents) products = result.documents
+  } catch {}
+  try {
+    const client = new Client().setEndpoint(endpoint).setProject(projectId)
+    const databases = new Databases(client)
+    const result = await databases.listDocuments(databaseId, categoriesCol, [])
+    if (result?.documents) categories = result.documents
+  } catch {}
+  try {
+    const client = new Client().setEndpoint(endpoint).setProject(projectId)
+    const databases = new Databases(client)
     const { documents: s } = await databases.listDocuments(databaseId, slidesCol, [])
     slides = (s || []).map(slide => ({
       title: slide.title || '',
