@@ -12,13 +12,12 @@ const categoriesCol = '6a231e1610e5801f72b5'
 export default async function EditProductPage({ params }) {
   const { id } = await params
 
-  const client = new Client().setEndpoint(endpoint).setProject(projectId)
-  const databases = new Databases(client)
-
   let product = null
   let categories = []
 
   try {
+    const client = new Client().setEndpoint(endpoint).setProject(projectId)
+    const databases = new Databases(client)
     const [prod, { documents: cats }] = await Promise.all([
       databases.getDocument(databaseId, productsCol, id),
       databases.listDocuments(databaseId, categoriesCol, []),

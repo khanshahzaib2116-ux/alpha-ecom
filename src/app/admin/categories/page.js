@@ -38,9 +38,11 @@ export default function AdminCategoriesPage() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this category?')) return
-    await databases.deleteDocument(DATABASE_ID, COLLECTIONS.categories, id)
-    const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.categories, [])
-    if (documents) setCategories(documents)
+    try {
+      await databases.deleteDocument(DATABASE_ID, COLLECTIONS.categories, id)
+      const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.categories, [])
+      if (documents) setCategories(documents)
+    } catch {}
   }
 
   if (fetching) {

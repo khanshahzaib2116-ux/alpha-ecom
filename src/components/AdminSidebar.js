@@ -21,7 +21,7 @@ export default function AdminSidebar() {
   const router = useRouter()
 
   const handleLogout = async () => {
-    await account.deleteSession('current')
+    try { await account.deleteSession('current') } catch {}
     router.push('/admin/login')
     router.refresh()
   }

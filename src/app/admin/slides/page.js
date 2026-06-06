@@ -46,9 +46,11 @@ export default function AdminSlidesPage() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this slide?')) return
-    await databases.deleteDocument(DATABASE_ID, COLLECTIONS.carouselSlides, id)
-    const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.carouselSlides, [])
-    if (documents) setSlides(documents)
+    try {
+      await databases.deleteDocument(DATABASE_ID, COLLECTIONS.carouselSlides, id)
+      const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.carouselSlides, [])
+      if (documents) setSlides(documents)
+    } catch {}
   }
 
   if (fetching) {

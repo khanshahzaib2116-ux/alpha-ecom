@@ -23,7 +23,8 @@ async function fetchProduct(id) {
 
 export async function generateMetadata({ params }) {
   const { id } = await params
-  const product = await fetchProduct(id)
+  let product = null
+  try { product = await fetchProduct(id) } catch {}
   return {
     title: product ? `${product.title} — Noir & Alabaster` : 'Product — Noir & Alabaster',
   }
@@ -31,7 +32,8 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductPage({ params }) {
   const { id } = await params
-  const product = await fetchProduct(id)
+  let product = null
+  try { product = await fetchProduct(id) } catch {}
   if (!product) notFound()
   return <ClientProductDetail product={product} />
 }

@@ -42,9 +42,11 @@ export default function AdminBlogsPage() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this post?')) return
-    await databases.deleteDocument(DATABASE_ID, COLLECTIONS.blogs, id)
-    const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.blogs, [])
-    if (documents) setBlogs(documents)
+    try {
+      await databases.deleteDocument(DATABASE_ID, COLLECTIONS.blogs, id)
+      const { documents } = await databases.listDocuments(DATABASE_ID, COLLECTIONS.blogs, [])
+      if (documents) setBlogs(documents)
+    } catch {}
   }
 
   if (fetching) {

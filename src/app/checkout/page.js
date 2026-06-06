@@ -59,12 +59,19 @@ export default function CheckoutPage() {
       form.country,
     ].filter(Boolean).join(', ')
 
-    const order = await databases.createDocument(DATABASE_ID, COLLECTIONS.orders, ID.unique(), {
-      user_id: user.$id,
-      total_amount: grandTotal,
-      status: 'pending',
-      shipping_address: addressLines,
-    })
+    let order
+    try {
+      order = await databases.createDocument(DATABASE_ID, COLLECTIONS.orders, ID.unique(), {
+        user_id: user.$id,
+        total_amount: grandTotal,
+        status: 'pending',
+        shipping_address: addressLines,
+      })
+    } catch {
+      setError('Failed to create order. Please try again.')
+      setLoading(false)
+      return
+    }
 
     const orderItems = items.map(item => ({
       order_id: order.$id,

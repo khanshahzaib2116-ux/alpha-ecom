@@ -9,7 +9,9 @@ export default function DeleteProductButton({ id }) {
 
   const handleDelete = async () => {
     if (!confirm('Delete this product?')) return
-    await databases.deleteDocument(DATABASE_ID, COLLECTIONS.products, id)
+    try {
+      await databases.deleteDocument(DATABASE_ID, COLLECTIONS.products, id)
+    } catch {}
     router.refresh()
   }
 

@@ -22,7 +22,9 @@ export default function AdminOrdersPage() {
   useEffect(() => { fetchOrders() }, [])
 
   const updateStatus = async (id, status) => {
-    await databases.updateDocument(DATABASE_ID, COLLECTIONS.orders, id, { status })
+    try {
+      await databases.updateDocument(DATABASE_ID, COLLECTIONS.orders, id, { status })
+    } catch {}
     fetchOrders()
   }
 
