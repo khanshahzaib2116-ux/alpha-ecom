@@ -1,6 +1,6 @@
 import { Client, Databases } from 'appwrite'
 import { CartProvider } from '@/context/CartContext'
-import { AuthProvider } from '@/context/AuthContext'
+import { AuthProvider, AuthGuard } from '@/context/AuthContext'
 import { WishlistProvider } from '@/context/WishlistContext'
 import Navbar from '@/components/Navbar'
 import CartPanel from '@/components/CartPanel'
@@ -34,6 +34,7 @@ export default async function RootLayout({ children }) {
     <html lang="en" className="h-full">
       <body className="min-h-full flex flex-col bg-white text-black antialiased">
         <AuthProvider>
+          <AuthGuard>
           <CartProvider>
             <WishlistProvider>
               <Navbar categories={categories} />
@@ -76,6 +77,7 @@ export default async function RootLayout({ children }) {
               </footer>
             </WishlistProvider>
           </CartProvider>
+          </AuthGuard>
         </AuthProvider>
       </body>
     </html>
