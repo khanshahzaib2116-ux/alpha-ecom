@@ -73,7 +73,7 @@ export default function AdminOrdersPage() {
         />
       </div>
 
-      <div className="bg-white overflow-hidden">
+      <div className="bg-white overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-black/5">
